@@ -1,0 +1,20 @@
+---
+- name: Create a base directory for openjdk
+  become: True
+  file:
+      path: "{{ base_path }}"
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+
+- name: Run the respective JDK/JRE installation
+  include: install.yml     
+  vars:        
+      name: "{{ item.name }}"
+      version: "{{ item.version | default(default_version) }}"
+      implementation: "{{ item.implementation | default(default_implementation) }}"
+      arch: "{{ item.arch | default(default_arch) }}"
+      release: "{{ item.release | default(default_release) }}"
+      type: "{{ item.type | default(default_type) }}"
+  loop: "{{ adoptopenjdk }}"

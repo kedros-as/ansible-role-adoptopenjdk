@@ -1,0 +1,40 @@
+---
+# You can specify a list of jdks/jres to be installed.
+# Every parameter other than name has its default as seen here. That means the following:
+#
+# adoptopenjdk:
+#   - name: jre1
+#   - name: jre2
+#
+# is equal to:
+#
+# adoptopenjdk:
+#   - name: jre1
+#     version: 11
+#     implementation: hotspot
+#     arch: x64
+#     release: latest
+#     type: jre
+#   - name: jre2
+#     version: 10
+#     implementation: hotspot
+#     arch: x64
+#     release: latest
+#     type: jre
+
+
+adoptopenjdk:
+    - name: jre11
+      version: 11
+      implementation: hotspot
+      arch: x64
+      release: latest
+      type: jre
+
+default_version: 11
+default_implementation: hotspot
+default_arch: x64
+default_release: latest
+default_type: jre
+
+base_path: /opt/adoptopenjdk

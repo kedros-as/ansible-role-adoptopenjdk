@@ -1,0 +1,51 @@
+---
+- debug:
+    msg: |
+        name={{ name }}
+        version={{ version }}
+        type={{ type }}
+
+- name: Get the Java release info
+  uri:
+      url: "https://api.adoptopenjdk.net/v2/info/releases/openjdk{{ version }}?openjdk_impl={{ implementation }}&os=linux&arch={{ arch }}&release={{ release }}&type={{ type }}"
+  register: release_info
+
+- name: Check if the release is installed
+  stat:
+      path: "{{ base_path }}/{{ release_info.json.release_name }}-{{ type }}"
+  register: release_stat
+
+- name: Install the new Java release
+  when: release_stat.stat.exists == False
+  block:
+      - name: Check current symlink target
+        stat: 
+            path: "{{ base_path }}/{{ name }}"
+        register: current_release_stat
+
+      - name: Download Java
+        become: True
+        unarchive:
+            src: "{{ release_info.json.binaries[0].binary_link }}"
+            dest: "{{ base_path }}"
+            remote_src: True
+            list_files: True
+            mode: u=rwX,g=rX,o=rX
+            owner: root
+            group: root
+        register: archive_unarchived
+
+      - name: Set the symlink
+        become: True
+        file:
+            path: "{{ base_path }}/{{ name }}"
+            src: "{{ base_path }}/{{ release_info.json.release_name }}{% if type == 'jre' %}-{{ type }}{% endif %}"
+            state: link
+
+      - name: Remove the old Java installation
+        become: True
+        file:
+            path: "{{ base_path }}/{{ current_release_stat.stat.lnk_target }}"
+            state: absent
+        when: current_release_stat.stat.exists == True
+
