@@ -12,14 +12,14 @@
 
 - name: Check if the release is installed
   stat:
-      path: "{{ base_path }}/{{ release_info.json.release_name }}-{{ type }}"
+      path: "{{ base_path }}/{{ release_info.json.release_name }}{% if type == 'jre' %}-{{ type }}{% endif %}"
   register: release_stat
 
 - name: Install the new Java release
-  when: release_stat.stat.exists == False
+  when: ! release_stat.stat.exists
   block:
       - name: Check current symlink target
-        stat: 
+        stat:
             path: "{{ base_path }}/{{ name }}"
         register: current_release_stat
 
@@ -42,10 +42,17 @@
             src: "{{ base_path }}/{{ release_info.json.release_name }}{% if type == 'jre' %}-{{ type }}{% endif %}"
             state: link
 
+      - name: Set alternative for java binary
+        become: True
+        alternatives:
+            link: /usr/bin/java
+            name: java
+            path: "{{ base_path }}/{{ name }}/bin/java"
+            priority: "{{ priority | default(omit) }}"
+
       - name: Remove the old Java installation
         become: True
         file:
             path: "{{ base_path }}/{{ current_release_stat.stat.lnk_target }}"
             state: absent
-        when: current_release_stat.stat.exists == True
-
+        when: current_release_stat.stat.exists

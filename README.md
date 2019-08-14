@@ -20,6 +20,7 @@ JDK/JREs to install are specified as a list in the following variable.
 	      arch: x64			# x64, x32, ppc64, s390x, ppc64le, aarch64
 	      release: latest		# latest, jdk8u172-b00-201807161800
 	      type: jre			# jdk, jre
+              priority: 50              # update-alternatives will be set for java with this priority (default is 50)
 
 
 Any option other than name can be ommited and the following defaults will be applied (you can override them).
@@ -44,17 +45,17 @@ None.
 Example Playbook
 ----------------
 
-- hosts: servers
-  roles:
-      - role: adoptopenjdk
-        vars:
-            adoptopenjdk:
-                - name: jdk11
-                  version: 11
-                  release: latest
-                  type: jdk
-		- name: jre10
-		  version: 10
+    - hosts: servers
+      roles:
+          - role: adoptopenjdk
+            vars:
+                adoptopenjdk:
+                    - name: jdk11
+                      version: 11
+                      release: latest
+                      type: jdk
+                    - name: jre10
+                      version: 10
 
 License
 -------
