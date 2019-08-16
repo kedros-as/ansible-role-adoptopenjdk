@@ -16,7 +16,7 @@
   register: release_stat
 
 - name: Install the new Java release
-  when: ! release_stat.stat.exists
+  when: not release_stat.stat.exists
   block:
       - name: Check current symlink target
         stat:
